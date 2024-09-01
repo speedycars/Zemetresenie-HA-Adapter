@@ -1,0 +1,1 @@
+start "Zemetresenie MQTT Agent" /min "PATH\zemetresenie.cmd"
