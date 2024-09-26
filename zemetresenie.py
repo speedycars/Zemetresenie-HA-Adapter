@@ -134,7 +134,7 @@ while True:
 
     def on_disconnect(client, userdata, rc):
         logging.info("Disconnected with result code: %s", rc)
-        reconnect_count, reconnect_delay = 0, FIRST_RECONNECT_DELAY
+        reconnect_count, reconnect_delay = 9, FIRST_RECONNECT_DELAY
         while reconnect_count < MAX_RECONNECT_COUNT:
             logging.info("Reconnecting in %d seconds...", reconnect_delay)
             time.sleep(reconnect_delay)
@@ -154,10 +154,12 @@ while True:
         FLAG_EXIT = True
 
     def run():
-        client = connect_mqtt()
-        publish(client)
-        client.on_disconnect = on_disconnect
-        time.sleep(2)
+        try:
+            client = connect_mqtt()
+            publish(client)
+            client.on_disconnect = on_disconnect
+        except:
+            return
 
     if __name__ == '__main__':
         run()
