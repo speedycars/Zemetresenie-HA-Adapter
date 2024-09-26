@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.service import Service
 
 service = Service()
 options = webdriver.ChromeOptions()
-options.add_argument('--headless')
+options.add_argument('--headless=old')
 options.add_argument("--disable-search-engine-choice-screen")
 
 url = "https://ndc.niggg.bas.bg/"
