@@ -1,22 +1,31 @@
 from bs4 import BeautifulSoup
 import datetime
 import time
-import random
+import configparser
+import pathlib
 from selenium import webdriver
 from paho.mqtt import client as mqtt_client
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 
+config_path = pathlib.Path(__file__).parent.absolute() / "config" / "config.cfg"
+config = configparser.ConfigParser()
+config.read(config_path, encoding='utf-8')
+
+broker = str(config.get('CONFIG', 'broker'))
+port = int(config.get('CONFIG', 'port'))
+username = str(config.get('CONFIG', 'username'))
+password = str(config.get('CONFIG', 'password'))
+freq = int(config.get('CONFIG', 'freq'))
+
 service = Service()
 options = webdriver.ChromeOptions()
 options.add_argument('--headless=old')
-options.add_argument("--disable-search-engine-choice-screen")
+options.add_argument('--disable-search-engine-choice-screen')
+options.add_argument('--disable-gpu')
+options.add_argument('--no-sandbox')
 
 url = "https://ndc.niggg.bas.bg/"
-broker = 'MQTT BROKER IP'
-port = PORT
-username = 'USERNAME'
-password = 'PASSWORD'
 client_id = f'mqttzemetresenie'
 topic0 = "homeassistant/sensor/zemetresenie/availability"
 topic1 = "homeassistant/sensor/zemetresenie/startdata"
@@ -49,7 +58,7 @@ while True:
     for td in soup.find_all('tr', {'class': 'event_list', 'id': 'row0'},limit = 1):
     #for td in soup.find_all('td', {'class': 'tdBottomRowSeperator'},limit = 100):
         td = str(td).replace('" target="_blank"><img src="img/download.png" style="width:20px;height:20px;"/></a></td></tr>','').replace('<tr class="event_list" id="row0"><td>1</td><td class="text-center">','').replace('</td><td class="text-center">','&').replace('</td><td><a href="','&').replace('</td><td><img src="img/download.png" style="filter: grayscale(100%) brightness(1.50);;width:20px;height:20px;"/></td></tr>','')
-        print(str(td)+'\n\n')
+        #print(str(td)+'\n\n')
         if '/' in td:
             availability = 1
             startdata = str((td).split("&")[0].split(" ")[1]).strip().replace('/','.')
@@ -94,14 +103,11 @@ while True:
     # Generate a Client ID with the publish prefix.
     msg0 = availability
     msg1 = startdata
-    #msg2 = "04:02:00"
     msg2 = startchas
-    #msg3 = "0.0"
     msg3 = magnitud
     msg4 = lat
     msg5 = lon
     msg6 = googlemapslink
-    #msg7 = "10.0"
     msg7 = dulbochina
     #msg8 = karta
 
@@ -166,5 +172,5 @@ while True:
         
 
     print('Cycle done! '+str(datetime.datetime.now())[0:-7]+'\n\n\n')
-    for i in range(30):
+    for i in range(freq):
         time.sleep(1)

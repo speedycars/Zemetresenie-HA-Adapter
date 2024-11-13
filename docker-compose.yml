@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  zemetresenie:
+    image: speedycars/zemetresenie:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
