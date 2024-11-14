@@ -3,7 +3,6 @@ import datetime
 import time
 import configparser
 import pathlib
-from selenium import webdriver
 from paho.mqtt import client as mqtt_client
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
