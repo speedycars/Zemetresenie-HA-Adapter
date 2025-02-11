@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import datetime
 import time
 import configparser
+import ast
 import pathlib
 from paho.mqtt import client as mqtt_client
 from selenium import webdriver
@@ -15,14 +16,21 @@ broker = str(config.get('CONFIG', 'broker'))
 port = int(config.get('CONFIG', 'port'))
 username = str(config.get('CONFIG', 'username'))
 password = str(config.get('CONFIG', 'password'))
+selenium_server = ast.literal_eval(config.get('CONFIG', 'selenium_server'))
 freq = int(config.get('CONFIG', 'freq'))
 
 service = Service()
 options = webdriver.ChromeOptions()
-options.add_argument('--headless=old')
+options.add_argument('--headless')
 options.add_argument('--disable-search-engine-choice-screen')
 options.add_argument('--disable-gpu')
+options.add_argument("--disable-cache")
+options.add_argument("--disable-crash-reporter");
+options.add_argument("--no-crash-upload");
 options.add_argument('--no-sandbox')
+options.add_argument('--ignore-certificate-errors')
+options.add_argument('--incognito')
+options.add_argument('--disable-dev-shm-usage')
 
 url = "https://ndc.niggg.bas.bg/"
 client_id = f'mqttzemetresenie'
@@ -47,7 +55,12 @@ dulbochina = 'unknown'
 
 while True:
     print('Starting new cycle! '+str(datetime.datetime.now())[0:-7]+'\n')
-    browser = webdriver.Chrome(service=service, options=options)
+    if selenium_server == "":
+        browser = webdriver.Chrome(service=service, options=options)
+        print("No external Selenium server is used.")
+    else:
+        browser = webdriver.Remote(command_executor=selenium_server, options=options)
+        print("Selenium server: "+selenium_server)
     browser.get(url)
     time.sleep(3)
     html = browser.page_source
